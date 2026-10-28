@@ -55,6 +55,8 @@ def recommend(
     radius: int = 3000,
     top: int = 3,
     max_candidates: int = 60,
+    min_rating: float | None = None,
+    travel_mode: str | None = None,
 ) -> dict:
     start = client.geocode(origin, city=city)
     pois: list[dict] = []
@@ -72,6 +74,8 @@ def recommend(
             continue
         if budget is not None and poi["cost"] is not None and poi["cost"] > budget:
             continue
+        if min_rating is not None and poi["rating"] is not None and poi["rating"] < min_rating:
+            continue
         poi["straight_m"] = round(haversine_m((start["lng"], start["lat"]), (poi["lng"], poi["lat"])))
         candidates.append(poi)
 
@@ -84,9 +88,15 @@ def recommend(
     picked = candidates[:top]
 
     for p in picked:
-        # 短距离步行/骑行更贴近真实出行，长距离才用驾车
+        # 用户指定了出行方式就照做；否则按直线距离自动选
         dist = p.get("straight_m") or 0
-        if dist < 1000:
+        if travel_mode == "walking":
+            mode, fn = "walking", client.walking
+        elif travel_mode == "bicycling":
+            mode, fn = "bicycling", client.bicycling
+        elif travel_mode == "driving":
+            mode, fn = "driving", client.driving
+        elif dist < 1000:
             mode, fn = "walking", client.walking
         elif dist < 3000:
             mode, fn = "bicycling", client.bicycling
@@ -110,7 +120,14 @@ def recommend(
 
     return {
         "origin": start,
-        "filters": {"keyword": keyword, "budget": budget, "radius_m": radius, "top": top},
+        "filters": {
+            "keyword": keyword,
+            "budget": budget,
+            "radius_m": radius,
+            "top": top,
+            "min_rating": min_rating,
+            "travel_mode": travel_mode or "auto",
+        },
         "total_candidates": len(pois),
         "filtered_candidates": len(candidates),
         "recommendations": picked,

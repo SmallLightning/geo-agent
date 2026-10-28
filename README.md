@@ -38,13 +38,54 @@ python3 src/demo.py --from "西湖" --city 杭州 --keyword 咖啡 --budget 60 -
 
 出行方式会按直线距离自动切换：<1km 步行、1–3km 骑行、>3km 驾车（骑行走 v4 接口，失败自动退回步行）。
 
+## 一句话出行（Agent 版）
+
+```bash
+python3 src/agent.py "从杭州东站出发，找家人均100以内、评分4.5以上、走路能到的餐厅，要前3家"
+```
+
+输出：
+
+```
+从 杭州东站 出发，3000 米内按人均100元以内、评分4.5以上帮你挑了 3 家：
+1. 不伤心理想国(杭州东站万象汇店)｜4.7分｜人均44元｜步行（0.6km，约8分钟）
+   地址：杭州东站万象汇L301(火车东站东广场地铁站J口旁)
+2. 九食二爷·汽锅蹄膀·下饭菜(天城路店)｜4.5分｜人均41元｜步行（1.0km，约13分钟）
+3. 小聚鲜(天城银座3幢店)｜4.5分｜人均94元｜步行（1.3km，约17分钟）
+```
+
+**两种解析模式，自动切换：**
+
+| 模式 | 触发条件 | 说明 |
+|---|---|---|
+| LLM 解析 | `.env` 里配了 `MINIMAX_API_KEY` 或 `STEPFUN_API_KEY` | 模型把自然语言转成严格 JSON 参数，并用自然语言润色结论 |
+| 规则解析 | 没配 Key / 调用失败 | 正则抽取起点、城市、预算、半径、评分、出行方式，**离线也能完整跑通** |
+
+接大模型（二选一）：
+
+```bash
+# MiniMax（参赛可领 1 个月 Token Plan）
+echo 'LLM_PROVIDER=minimax'   >> .env
+echo 'MINIMAX_API_KEY=你的Key' >> .env
+echo 'MINIMAX_GROUP_ID=你的GroupId' >> .env   # 旧版接口需要
+
+# 阶跃星辰 StepFun
+echo 'LLM_PROVIDER=stepfun'   >> .env
+echo 'STEPFUN_API_KEY=你的Key' >> .env
+```
+
+`LLM_BASE_URL` / `LLM_MODEL` 可覆盖默认值，兼容任何 OpenAI 协议端点。
+
 ## 目录结构
 
 ```
 geo-agent/
 ├── src/
 │   ├── amap_client.py   # 高德 Web 服务封装（地理编码/逆地理/POI 周边与关键字/驾车步行骑行/距离矩阵/IP定位）
-│   └── demo.py          # 端到端示例：起点 + 预算 -> 推荐 + 驾车路线
+│   ├── llm.py           # OpenAI 协议客户端（MiniMax / StepFun / 任意兼容端点）
+│   ├── intent.py        # 自然语言 → 结构化参数（规则解析 + LLM 解析，可降级）
+│   ├── agent.py         # 一句话入口：解析 → 检索 → 行程建议
+│   └── demo.py          # 纯命令行示例：起点 + 预算 → 推荐 + 路线
 ├── .env.example         # 各平台 Key 模板
 └── README.md
 ```
