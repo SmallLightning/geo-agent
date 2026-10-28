@@ -7,11 +7,26 @@
 
 | 项 | 内容 |
 |---|---|
-| 赛道 | AI 生态 · 高德地图（1 题） |
-| 作品名称 | 空间智能 Agent —— 把一句话变成可执行的行程 |
+| 赛道 | AI 生态 · 高德地图（1 题，20 分） |
+| 题目标题 | 周边去哪儿：基于高德的地点推荐助手 |
+| 作品名称 | nearby-explorer（空间智能 Agent） |
 | 团队 | OceanBase 数据库大赛参赛队（SmallLightning） |
 | 联系人 | 章智皓 · 2775834623@qq.com |
 | 提交日期 | 2026-10-28 |
+
+## 一之二、交付形态：Agent Skill
+
+题目要求「编写一个轻量的周边探索 **Skill**」，因此仓库按 Agent Skill 规范组织：
+
+```
+SKILL.md                 # 触发条件、调用方式、输出格式、能力边界
+scripts/nearby.py        # Skill 入口：一句话 → 地点 + 到达方式（--json 供 Agent 解析）
+src/                     # 实现：意图解析、高德工具层、排序规划、离线降级
+web/ + src/web.py        # 浏览器 UI（人工演示用，可选）
+tests/                   # 16 个 stdlib 单测
+```
+
+宿主 Agent 只需执行 `python3 scripts/nearby.py --query "<用户原话>" --json`，即可拿到结构化结果。
 
 ## 二、仓库信息
 
@@ -61,12 +76,14 @@ cd geo-agent
 | 交付物 | 状态 |
 |---|---|
 | 代码仓库（public） | ✅ |
+| **SKILL.md（Agent Skill 规范）** | ✅ |
+| Skill 入口脚本 `scripts/nearby.py` | ✅ |
 | README（架构、跑法、接口说明） | ✅ |
 | 单元测试（16 个） | ✅ |
 | 离线演示数据 | ✅ |
+| Web UI（`python3 src/web.py`） | ✅ |
 | **演示视频（2–3 分钟）** | ❌ 待录 |
 | 在线 Demo | ❌ 暂未部署（可选） |
-| 效果截图 | ❌ 待补 |
 
 ## 八、演示视频分镜（3 分钟）
 

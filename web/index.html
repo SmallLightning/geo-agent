@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>空间智能 Agent · 一句话出行</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel-2:#1e222b; --line:#2a2f3a;
+    --text:#e8ecf4; --muted:#93a0b5; --brand:#4c8dff; --brand-2:#2f6fe0;
+    --ok:#3ecf8e; --warn:#f0b429;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       background:radial-gradient(1200px 600px at 50% -10%,#1b2436 0%,var(--bg) 55%);
+       color:var(--text);min-height:100vh}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 20px 80px}
+  header h1{font-size:30px;margin:0 0 8px;letter-spacing:.5px}
+  header p{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+  .badge{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;
+         font-size:12px;background:#22304a;color:#9fc0ff;border:1px solid #2f4670}
+  .bar{display:flex;gap:10px;margin:26px 0 14px}
+  .bar input{flex:1;padding:15px 16px;border-radius:12px;border:1px solid var(--line);
+             background:var(--panel);color:var(--text);font-size:15px;outline:none}
+  .bar input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(76,141,255,.15)}
+  .bar button{padding:0 22px;border-radius:12px;border:0;background:linear-gradient(180deg,var(--brand),var(--brand-2));
+              color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  .bar button:disabled{opacity:.55;cursor:progress}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel-2);
+        color:var(--muted);font-size:13px;cursor:pointer}
+  .chip:hover{color:var(--text);border-color:#3a4considerable}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:16px}
+  .answer{white-space:pre-wrap;line-height:1.85;font-size:15px}
+  .meta{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);color:var(--muted);font-size:13px}
+  .meta code{background:#0d1016;padding:2px 6px;border-radius:5px;color:#a9c1ee}
+  .place{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line)}
+  .place:last-child{border-bottom:0}
+  .rank{flex:0 0 28px;height:28px;line-height:28px;text-align:center;border-radius:9px;
+        background:#233047;color:#9fc0ff;font-weight:700;font-size:13px}
+  .name{font-size:16px;font-weight:600;margin-bottom:4px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+  .tag{font-size:12px;padding:3px 8px;border-radius:6px;background:#202634;color:#b9c6da;border:1px solid #2b3345}
+  .tag.good{color:#9ce8c3;border-color:#2c5744;background:#16281f}
+  .addr{color:var(--muted);font-size:13px;margin-top:4px}
+  .addr a{color:#7fb0ff;text-decoration:none}
+  .foot{color:#5f6b7f;font-size:12px;text-align:center;margin-top:36px;line-height:1.8}
+  .err{color:#ff9b9b}
+  @media(max-width:600px){.bar{flex-direction:column}.bar button{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>空间智能 Agent<span class="badge" id="mode">检测中…</span></h1>
+    <p>说一句人话，帮你算出「去哪、怎么去」。<br>
+       例：从杭州东站出发，找家人均 100 以内、评分 4.5 以上、走路能到的餐厅，要前 3 家。</p>
+  </header>
+
+  <div class="bar">
+    <input id="q" placeholder="例如：西湖附近人均 60 以下的咖啡店" autocomplete="off">
+    <button id="go">规划</button>
+  </div>
+
+  <div class="chips">
+    <div class="chip">从杭州东站出发，找家人均100以内、走路能到的餐厅，要前3家</div>
+    <div class="chip">西湖附近人均60以下的咖啡店，评分4.5以上</div>
+    <div class="chip">上海人民广场附近2公里内评分4.8以上的火锅，前5家</div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="foot">
+    数据来源：高德开放平台（POI 检索 / 路径规划 / 地理编码）<br>
+    无 Key 时自动使用内置快照数据 · 结果仅供出行参考
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MODE_LABEL = {walking:"步行", bicycling:"骑行", driving:"驾车"};
+
+fetch("/api/health").then(r => r.ok ? "在线" : "异常").catch(() => "离线")
+  .then(t => { $("mode").textContent = t; });
+
+function tags(p){
+  const out = [];
+  if (p.rating != null) out.push(`<span class="tag good">★ ${p.rating.toFixed(1)}</span>`);
+  if (p.cost != null) out.push(`<span class="tag">人均 ¥${p.cost.toFixed(0)}</span>`);
+  const r = p.route || {};
+  if (r.error) out.push(`<span class="tag">路线不可用</span>`);
+  else if (r.distance_m != null) out.push(`<span class="tag">${MODE_LABEL[r.mode] || "路程"} ${(r.distance_m/1000).toFixed(1)}km · ${Math.round(r.duration_s/60)}分钟</span>`);
+  if (p.straight_m) out.push(`<span class="tag">直线 ${p.straight_m}m</span>`);
+  return out.join("");
+}
+
+function mapLink(p){
+  if (p.lng == null) return "";
+  const q = encodeURIComponent(`${p.name},${p.lng},${p.lat}`);
+  return `<a href="https://uri.amap.com/marker?position=${p.lng},${p.lat}&name=${encodeURIComponent(p.name)}" target="_blank" rel="noopener">在地图里看</a>`;
+}
+
+function render(data){
+  if (!data.ok) {
+    $("out").innerHTML = `<div class="card err">解析失败：${esc(data.error || "未知错误")}</div>`;
+    return;
+  }
+  const i = data.intent, r = data.result;
+  const recs = (r.recommendations || []).map((p, n) => `
+    <div class="place">
+      <div class="rank">${n+1}</div>
+      <div style="flex:1">
+        <div class="name">${esc(p.name)}</div>
+        <div class="tags">${tags(p)}</div>
+        <div class="addr">${esc(p.address || "")} ${mapLink(p)}</div>
+      </div>
+    </div>`).join("");
+
+  const flags = [];
+  if (data.offline) flags.push("离线快照");
+  if (data.llm_used) flags.push("LLM 解析");
+  $("out").innerHTML = `
+    <div class="card">
+      <div class="answer">${esc(data.answer)}</div>
+      <div class="meta">
+        解析：<code>${esc(i.source)}</code> ·
+        起点 ${esc(i.origin)} · 城市 ${esc(i.city || "自动")} ·
+        关键词 ${esc(i.keyword)} · 人均 ≤${i.budget ?? "不限"} ·
+        半径 ${i.radius_m}m · 评分 ≥${i.min_rating ?? "不限"} ·
+        出行 ${esc(i.travel_mode || "自动")}
+        ${flags.length ? " · " + flags.join(" / ") : ""}
+      </div>
+    </div>
+    <div class="card">${recs || '<div class="addr">没有符合条件的地点，试试放宽预算或范围。</div>'}</div>`;
+}
+
+async function ask(text){
+  if (!text.trim()) return;
+  $("go").disabled = true; $("go").textContent = "规划中…";
+  $("out").innerHTML = `<div class="card"><div class="answer">正在查询高德…</div></div>`;
+  try {
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({text}),
+    });
+    render(await res.json());
+  } catch (e) {
+    $("out").innerHTML = `<div class="card err">请求失败：${esc(e.message)}</div>`;
+  } finally {
+    $("go").disabled = false; $("go").textContent = "规划";
+  }
+}
+
+$("go").onclick = () => ask($("q").value);
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") ask($("q").value); });
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => { $("q").value = c.textContent; ask(c.textContent); });
+</script>
+</body>
+</html>

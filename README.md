@@ -9,6 +9,22 @@
 - 高德赛题：位置服务的深度使用（POI 检索 + 多模式路径规划 + 地理编码消歧）
 - 现状：纯规则版已跑通端到端（无 LLM 依赖，零第三方库）
 
+## 作为 Agent Skill 使用
+
+仓库根目录的 `SKILL.md` 描述了 Skill 的触发条件、调用方式和输出格式，宿主 Agent 按它加载即可：
+
+```bash
+python3 scripts/nearby.py --query "从杭州东站出发，人均100以内、走路能到的餐厅"
+python3 scripts/nearby.py --query "西湖附近人均60以下的咖啡店" --json
+```
+
+同一条链路还有两个入口，行为完全一致（共用 `src/agent.py`）：
+
+```bash
+./run.sh                      # 命令行，自动判断在线/离线
+python3 src/web.py            # 浏览器 UI → http://127.0.0.1:8000
+```
+
 ## 给评审 / 评测机：30 秒跑起来
 
 ```bash
