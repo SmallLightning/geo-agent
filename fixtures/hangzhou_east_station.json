@@ -1,0 +1,222 @@
+{
+  "origin": {
+    "input": "杭州东站",
+    "formatted": "杭州东站",
+    "lng": 120.2126,
+    "lat": 30.290851,
+    "adcode": "330102",
+    "city": "杭州市"
+  },
+  "filters": {
+    "keyword": "餐厅",
+    "budget": null,
+    "radius_m": 3000,
+    "top": 10,
+    "min_rating": null,
+    "travel_mode": "auto"
+  },
+  "total_candidates": 75,
+  "filtered_candidates": 10,
+  "recommendations": [
+    {
+      "name": "不伤心理想国(杭州东站万象汇店)",
+      "address": "杭州东站万象汇L301(火车东站东广场地铁站J口旁)",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "13858977758",
+      "lng": 120.217334,
+      "lat": 30.293412,
+      "rating": 4.7,
+      "cost": 44.0,
+      "distance_m": 536,
+      "poi_id": "B0GKLHHXQF",
+      "straight_m": 536,
+      "route": {
+        "mode": "walking",
+        "distance_m": 585,
+        "duration_s": 468,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "静月茶事(德必易园店)",
+      "address": "彭埠街道东宁路553号德必易园B2106",
+      "type": "餐饮服务;茶艺馆;茶艺馆",
+      "tel": "15372050789",
+      "lng": 120.217433,
+      "lat": 30.290941,
+      "rating": 4.6,
+      "cost": 112.0,
+      "distance_m": 464,
+      "poi_id": "B0FFIKJPWT",
+      "straight_m": 464,
+      "route": {
+        "mode": "walking",
+        "distance_m": 797,
+        "duration_s": 638,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "九食二爷·汽锅蹄膀·下饭菜(天城路店)",
+      "address": "红街天城4幢底商20号",
+      "type": "餐饮服务;中餐厅;中餐厅",
+      "tel": "17366653309",
+      "lng": 120.208403,
+      "lat": 30.292181,
+      "rating": 4.5,
+      "cost": 41.0,
+      "distance_m": 429,
+      "poi_id": "B0J3UL2U2J",
+      "straight_m": 429,
+      "route": {
+        "mode": "walking",
+        "distance_m": 989,
+        "duration_s": 791,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "小聚鲜(天城银座3幢店)",
+      "address": "天城路6天城银座3幢F1层",
+      "type": "餐饮服务;中餐厅;中餐厅",
+      "tel": [],
+      "lng": 120.207751,
+      "lat": 30.290111,
+      "rating": 4.5,
+      "cost": 94.0,
+      "distance_m": 473,
+      "poi_id": "B0HARN1J4X",
+      "straight_m": 473,
+      "route": {
+        "mode": "walking",
+        "distance_m": 1310,
+        "duration_s": 1048,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "台州人家·杭帮菜·川菜(迈达商业中心店)",
+      "address": "天城银座2幢1层109室、110室",
+      "type": "餐饮服务;中餐厅;中餐厅",
+      "tel": "15968160719;18768115395",
+      "lng": 120.207506,
+      "lat": 30.289954,
+      "rating": 4.5,
+      "cost": 70.0,
+      "distance_m": 499,
+      "poi_id": "B0FFH3QDRK",
+      "straight_m": 499,
+      "route": {
+        "mode": "walking",
+        "distance_m": 1280,
+        "duration_s": 1024,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "李先生牛肉面大王(杭州东站店)",
+      "address": "天城路1号杭州东站B1层",
+      "type": "餐饮服务;快餐厅;快餐厅",
+      "tel": "13881980883",
+      "lng": 120.209486,
+      "lat": 30.289881,
+      "rating": 4.3,
+      "cost": 36.0,
+      "distance_m": 318,
+      "poi_id": "B0GR95P0CO",
+      "straight_m": 318,
+      "route": {
+        "mode": "walking",
+        "distance_m": 623,
+        "duration_s": 498,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "麦当劳(杭州东站东广场店)",
+      "address": "天城路1号杭州东站B1层",
+      "type": "餐饮服务;快餐厅;麦当劳",
+      "tel": "0571-63612114",
+      "lng": 120.215945,
+      "lat": 30.292711,
+      "rating": 4.3,
+      "cost": 42.0,
+      "distance_m": 382,
+      "poi_id": "B0L1550QB7",
+      "straight_m": 382,
+      "route": {
+        "mode": "walking",
+        "distance_m": 417,
+        "duration_s": 334,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "维也纳国际酒店-锦粤宫精致粤菜(杭州东站店)",
+      "address": "东宁路553号维也纳酒店A座",
+      "type": "餐饮服务;中餐厅;广东菜(粤菜)",
+      "tel": "0571-86599143",
+      "lng": 120.217285,
+      "lat": 30.290591,
+      "rating": 4.3,
+      "cost": 90.0,
+      "distance_m": 451,
+      "poi_id": "B0H0TPQDFN",
+      "straight_m": 451,
+      "route": {
+        "mode": "walking",
+        "distance_m": 802,
+        "duration_s": 642,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "衢州府粗菜馆(天城银座3幢店)",
+      "address": "天城路6天城银座3幢F1层",
+      "type": "餐饮服务;中餐厅;中餐厅",
+      "tel": "0571-85231657;15957198203;18667197175",
+      "lng": 120.207304,
+      "lat": 30.28981,
+      "rating": 4.3,
+      "cost": 85.0,
+      "distance_m": 522,
+      "poi_id": "B0FFH3QG90",
+      "straight_m": 522,
+      "route": {
+        "mode": "walking",
+        "distance_m": 1255,
+        "duration_s": 1004,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "麦当劳(高铁东站出发夹层餐厅)",
+      "address": "彭埠街道天城路1号杭州东站3层",
+      "type": "餐饮服务;快餐厅;麦当劳",
+      "tel": "0571-86936973",
+      "lng": 120.211825,
+      "lat": 30.291025,
+      "rating": 4.2,
+      "cost": 36.0,
+      "distance_m": 76,
+      "poi_id": "B0L0ARDAIK",
+      "straight_m": 77,
+      "route": {
+        "mode": "walking",
+        "distance_m": 128,
+        "duration_s": 102,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    }
+  ]
+}

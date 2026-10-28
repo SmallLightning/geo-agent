@@ -9,6 +9,26 @@
 - 高德赛题：位置服务的深度使用（POI 检索 + 多模式路径规划 + 地理编码消歧）
 - 现状：纯规则版已跑通端到端（无 LLM 依赖，零第三方库）
 
+## 给评审 / 评测机：30 秒跑起来
+
+```bash
+git clone https://github.com/SmallLightning/geo-agent && cd geo-agent
+./run.sh
+```
+
+**不需要任何 API Key，不需要联网。** 脚本会自动检测：没有 `AMAP_KEY` 就使用 `fixtures/` 里录制好的真实高德快照（离线演示），配了 Key 就走实时接口。
+
+自测：
+
+```bash
+python3 -m unittest discover -s tests -v     # 16 个用例，0.6 秒跑完，不碰网络
+```
+
+| 测试覆盖 | 说明 |
+|---|---|
+| `tests/test_core.py` | 意图解析（起点/城市/预算/半径/评分/出行方式）、地标消歧、过滤与排序、出行方式阈值 |
+| `tests/test_llm.py` | 用本地假 OpenAI 服务验证 LLM 客户端：鉴权头、json_mode、解析合并、失败降级 |
+
 ## 快速开始
 
 ```bash
@@ -20,6 +40,9 @@ python3 src/demo.py --from "杭州东站" --city 杭州 --budget 100 --radius 30
 
 # 3. 输出 JSON（给 Agent / Dify 当工具结果用）
 python3 src/demo.py --from "西湖" --city 杭州 --keyword 咖啡 --budget 60 --json
+
+# 4. 离线模式（无 Key、无网络）
+python3 src/agent.py --offline "从杭州东站出发，人均100以内的餐厅"
 ```
 
 示例输出：
@@ -80,12 +103,17 @@ echo 'STEPFUN_API_KEY=你的Key' >> .env
 
 ```
 geo-agent/
+├── run.sh               # 一键入口（自动判断在线 / 离线）
 ├── src/
-│   ├── amap_client.py   # 高德 Web 服务封装（地理编码/逆地理/POI 周边与关键字/驾车步行骑行/距离矩阵/IP定位）
+│   ├── amap_client.py   # 高德 Web 服务封装（地理编码/逆地理/POI/路径规划/距离矩阵）
 │   ├── llm.py           # OpenAI 协议客户端（MiniMax / StepFun / 任意兼容端点）
 │   ├── intent.py        # 自然语言 → 结构化参数（规则解析 + LLM 解析，可降级）
+│   ├── planner.py       # 纯函数：距离、过滤、排序、出行方式（无网络，可单测）
+│   ├── offline.py       # 离线快照回放，无 Key / 无网也能跑
 │   ├── agent.py         # 一句话入口：解析 → 检索 → 行程建议
-│   └── demo.py          # 纯命令行示例：起点 + 预算 → 推荐 + 路线
+│   └── demo.py          # 纯命令行示例
+├── fixtures/            # 录制的高德真实响应（离线演示用）
+├── tests/               # stdlib unittest，16 个用例
 ├── .env.example         # 各平台 Key 模板
 └── README.md
 ```

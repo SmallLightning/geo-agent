@@ -15,10 +15,11 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.amap_client import AmapClient  # noqa: E402
+from src.amap_client import AmapClient, AmapError  # noqa: E402
 from src.demo import load_env, recommend  # noqa: E402
 from src.intent import Intent, parse_llm, parse_rules  # noqa: E402
 from src.llm import LLMClient, LLMError  # noqa: E402
+from src import offline as offline_mode  # noqa: E402
 
 ANSWER_SYSTEM = """你是贴心的出行助手。根据给定的候选地点与路线数据，用中文写一段 3~5 行的推荐。
 
@@ -63,7 +64,10 @@ def compose_template(intent: Intent, result: dict) -> str:
         lines.append(f"{i}. {p['name']}｜{rating}｜{cost}｜{route_txt}")
         if p.get("address"):
             lines.append(f"   地址：{p['address']}")
-    lines.append("以上地点均来自高德地图实时 POI 数据，营业状态请出发前再确认。")
+    if result.get("offline_fixture"):
+        lines.append(f"（离线演示：数据来自录制快照 {result['offline_fixture']}，非实时）")
+    else:
+        lines.append("以上地点均来自高德地图实时 POI 数据，营业状态请出发前再确认。")
     return "\n".join(lines)
 
 
@@ -95,27 +99,36 @@ def compose_llm(llm: LLMClient, text: str, intent: Intent, result: dict) -> str:
     )
 
 
-def run(text: str, use_llm: bool = True) -> dict:
+def run(text: str, use_llm: bool = True, offline: bool = False) -> dict:
     load_env(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
-    amap = AmapClient()
     llm = LLMClient() if use_llm else None
 
     intent = parse_llm(llm, text) if (llm and llm.configured) else parse_rules(text)
     if not intent.origin:
         return {"ok": False, "error": "没能识别出起点", "intent": intent.to_dict(), "notes": intent.notes}
 
-    result = recommend(
-        amap,
-        origin=intent.origin,
-        city=intent.city,
-        budget=intent.budget,
-        keyword=intent.keyword,
-        types=intent.types,
-        radius=intent.radius_m,
-        top=intent.top,
-        min_rating=intent.min_rating,
-        travel_mode=intent.travel_mode,
-    )
+    used_offline = offline
+    if offline:
+        result = offline_mode.build_result(intent)
+    else:
+        try:
+            result = recommend(
+                AmapClient(),
+                origin=intent.origin,
+                city=intent.city,
+                budget=intent.budget,
+                keyword=intent.keyword,
+                types=intent.types,
+                radius=intent.radius_m,
+                top=intent.top,
+                min_rating=intent.min_rating,
+                travel_mode=intent.travel_mode,
+            )
+        except AmapError as exc:
+            # 没有 Key / 没有网络时自动降级到快照，保证任何机器上都能跑通
+            intent.notes.append(f"实时检索不可用，已切换离线快照：{exc}")
+            result = offline_mode.build_result(intent)
+            used_offline = True
 
     answer = None
     if llm and llm.configured:
@@ -131,6 +144,7 @@ def run(text: str, use_llm: bool = True) -> dict:
         "request": text,
         "intent": intent.to_dict(),
         "llm_used": bool(llm and llm.configured),
+        "offline": used_offline,
         "answer": answer,
         "result": result,
     }
@@ -141,9 +155,10 @@ def main() -> int:
     ap.add_argument("text", help="自然语言请求")
     ap.add_argument("--json", action="store_true", help="输出完整 JSON")
     ap.add_argument("--no-llm", action="store_true", help="强制只用规则解析")
+    ap.add_argument("--offline", action="store_true", help="只用离线快照，不访问高德接口")
     args = ap.parse_args()
 
-    out = run(args.text, use_llm=not args.no_llm)
+    out = run(args.text, use_llm=not args.no_llm, offline=args.offline)
     if args.json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     elif not out.get("ok"):
@@ -157,7 +172,7 @@ def main() -> int:
               f"city={out['intent']['city']} keyword={out['intent']['keyword']} "
               f"budget={out['intent']['budget']} radius={out['intent']['radius_m']} "
               f"top={out['intent']['top']} min_rating={out['intent']['min_rating']} "
-              f"mode={out['intent']['travel_mode']} llm={out['llm_used']}")
+              f"mode={out['intent']['travel_mode']} llm={out['llm_used']} offline={out['offline']}")
     return 0 if out.get("ok") else 1
 
 

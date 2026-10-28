@@ -1,0 +1,206 @@
+{
+  "origin": {
+    "input": "西湖",
+    "formatted": "浙江省杭州市西湖区",
+    "lng": 120.130396,
+    "lat": 30.259242,
+    "adcode": "330106",
+    "city": "杭州市"
+  },
+  "filters": {
+    "keyword": "咖啡",
+    "budget": null,
+    "radius_m": 3000,
+    "top": 10,
+    "min_rating": null,
+    "travel_mode": "auto"
+  },
+  "total_candidates": 75,
+  "filtered_candidates": 10,
+  "recommendations": [
+    {
+      "name": "华大咖啡(环碧湖舍店)",
+      "address": "杨公堤43号环碧湖舍",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "13336011089;19902780062",
+      "lng": 120.130253,
+      "lat": 30.25152,
+      "rating": 4.7,
+      "cost": 53.0,
+      "distance_m": 859,
+      "poi_id": "B0K2N4KZKT",
+      "straight_m": 859,
+      "route": {
+        "mode": "walking",
+        "distance_m": 943,
+        "duration_s": 754,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "Retronasal Coffee",
+      "address": "黄姑山路3号-2",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "17398023201",
+      "lng": 120.133668,
+      "lat": 30.272758,
+      "rating": 4.7,
+      "cost": 29.0,
+      "distance_m": 1537,
+      "poi_id": "B0LDZDUX29",
+      "straight_m": 1535,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 2281,
+        "duration_s": 547
+      }
+    },
+    {
+      "name": "星巴克咖啡(杭州孤山路店)",
+      "address": "西湖风景名胜区孤山路21号1层101室",
+      "type": "餐饮服务;咖啡厅;星巴克咖啡",
+      "tel": "0571-87023762",
+      "lng": 120.144734,
+      "lat": 30.250981,
+      "rating": 4.7,
+      "cost": 30.0,
+      "distance_m": 1657,
+      "poi_id": "B0K36B931K",
+      "straight_m": 1655,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 2375,
+        "duration_s": 570
+      }
+    },
+    {
+      "name": "星巴克杭州北山路店",
+      "address": "北山街87号-5",
+      "type": "餐饮服务;咖啡厅;星巴克咖啡",
+      "tel": "0571-87989859",
+      "lng": 120.132615,
+      "lat": 30.25196,
+      "rating": 4.6,
+      "cost": 30.0,
+      "distance_m": 838,
+      "poi_id": "B023B17WQU",
+      "straight_m": 837,
+      "route": {
+        "mode": "walking",
+        "distance_m": 1013,
+        "duration_s": 810,
+        "tolls": null,
+        "traffic_lights": null
+      }
+    },
+    {
+      "name": "院子里的猫coffee",
+      "address": "西溪路358-2号",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "15168245041",
+      "lng": 120.127795,
+      "lat": 30.268229,
+      "rating": 4.6,
+      "cost": 41.0,
+      "distance_m": 1031,
+      "poi_id": "B0J1KH6DTV",
+      "straight_m": 1030,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 1541,
+        "duration_s": 370
+      }
+    },
+    {
+      "name": "Bean's Cafe",
+      "address": "西溪路358-6号",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "13857199991",
+      "lng": 120.127527,
+      "lat": 30.268328,
+      "rating": 4.6,
+      "cost": 49.0,
+      "distance_m": 1048,
+      "poi_id": "B0FFFFYFVY",
+      "straight_m": 1047,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 1569,
+        "duration_s": 377
+      }
+    },
+    {
+      "name": "星巴克(黄龙世纪广场店)",
+      "address": "杭大路1号黄龙世纪广场B区一层15号室",
+      "type": "餐饮服务;咖啡厅;星巴克咖啡",
+      "tel": "0571-87204366",
+      "lng": 120.140793,
+      "lat": 30.267984,
+      "rating": 4.6,
+      "cost": 30.0,
+      "distance_m": 1395,
+      "poi_id": "B0FFK5TQMV",
+      "straight_m": 1394,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 2012,
+        "duration_s": 483
+      }
+    },
+    {
+      "name": "顾宫有喜(玛瑙寺店)",
+      "address": "北山街葛岭路17号内",
+      "type": "餐饮服务;咖啡厅;咖啡厅",
+      "tel": "15868409290",
+      "lng": 120.144775,
+      "lat": 30.257293,
+      "rating": 4.6,
+      "cost": 65.0,
+      "distance_m": 1399,
+      "poi_id": "B0ID45P4B3",
+      "straight_m": 1398,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 2486,
+        "duration_s": 597
+      }
+    },
+    {
+      "name": "星巴克(杭州嘉华店)",
+      "address": "杭大路15号1-2F(黄龙洞地铁站A1口步行390米)",
+      "type": "餐饮服务;咖啡厅;星巴克咖啡|餐饮服务;快餐厅;快餐厅",
+      "tel": "0571-87168202",
+      "lng": 120.14048,
+      "lat": 30.268993,
+      "rating": 4.6,
+      "cost": 30.0,
+      "distance_m": 1455,
+      "poi_id": "B023B09TWT",
+      "straight_m": 1454,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 1894,
+        "duration_s": 455
+      }
+    },
+    {
+      "name": "星巴克(杭州黄龙时代广场店)",
+      "address": "天目山路274号黄龙时代广场A座",
+      "type": "餐饮服务;咖啡厅;星巴克咖啡",
+      "tel": "0571-87823869",
+      "lng": 120.124866,
+      "lat": 30.272691,
+      "rating": 4.6,
+      "cost": 34.0,
+      "distance_m": 1588,
+      "poi_id": "B0FFF9KSTX",
+      "straight_m": 1587,
+      "route": {
+        "mode": "bicycling",
+        "distance_m": 2451,
+        "duration_s": 588
+      }
+    }
+  ]
+}

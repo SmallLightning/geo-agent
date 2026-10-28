@@ -18,6 +18,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.amap_client import AmapClient  # noqa: E402
+from src.planner import pick_mode, select  # noqa: E402
 
 
 def load_env(path: str = ".env") -> None:
@@ -31,18 +32,6 @@ def load_env(path: str = ".env") -> None:
                 continue
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
-
-
-def haversine_m(a: tuple[float, float], b: tuple[float, float]) -> float:
-    from math import asin, cos, radians, sin, sqrt
-
-    lon1, lat1 = a
-    lon2, lat2 = b
-    r = 6371000.0
-    dlat = radians(lat2 - lat1)
-    dlon = radians(lon2 - lon1)
-    h = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
-    return 2 * r * asin(sqrt(h))
 
 
 def recommend(
@@ -68,40 +57,18 @@ def recommend(
         if len(pois) >= max_candidates or len(batch) < 25:
             break
 
-    candidates = []
-    for poi in pois:
-        if poi["lng"] is None or poi["lat"] is None:
-            continue
-        if budget is not None and poi["cost"] is not None and poi["cost"] > budget:
-            continue
-        if min_rating is not None and poi["rating"] is not None and poi["rating"] < min_rating:
-            continue
-        poi["straight_m"] = round(haversine_m((start["lng"], start["lat"]), (poi["lng"], poi["lat"])))
-        candidates.append(poi)
-
-    def score(p: dict) -> tuple[float, float]:
-        rating = p.get("rating") or 0.0
-        dist = p.get("distance_m") or p.get("straight_m") or 99999
-        return (-rating, dist)
-
-    candidates.sort(key=score)
-    picked = candidates[:top]
+    picked = select(
+        pois,
+        (start["lng"], start["lat"]),
+        budget=budget,
+        min_rating=min_rating,
+        top=top,
+    )
+    candidates = picked
 
     for p in picked:
-        # 用户指定了出行方式就照做；否则按直线距离自动选
-        dist = p.get("straight_m") or 0
-        if travel_mode == "walking":
-            mode, fn = "walking", client.walking
-        elif travel_mode == "bicycling":
-            mode, fn = "bicycling", client.bicycling
-        elif travel_mode == "driving":
-            mode, fn = "driving", client.driving
-        elif dist < 1000:
-            mode, fn = "walking", client.walking
-        elif dist < 3000:
-            mode, fn = "bicycling", client.bicycling
-        else:
-            mode, fn = "driving", client.driving
+        mode = pick_mode(p.get("straight_m"), travel_mode)
+        fn = {"walking": client.walking, "bicycling": client.bicycling, "driving": client.driving}[mode]
         try:
             route = fn(f"{start['lng']:.6f},{start['lat']:.6f}", f"{p['lng']:.6f},{p['lat']:.6f}")
             route["mode"] = mode
