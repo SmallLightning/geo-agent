@@ -31,10 +31,19 @@ tests/                   # 16 个 stdlib 单测
 ## 二、仓库信息
 
 ```
-仓库地址：https://github.com/SmallLightning/geo-agent
-分支：    feat/amap-track
-commit：  （见最后一次 commit）
+仓库地址：https://github.com/SmallLightning/powercontext-eco
+分支：    2026-competition-ecosystem
+commit：  9d73d380f2be32018fbdc80fbe70cf2f21c5195c
+提交文件：gaode/SKILL.md（+ gaode/README.md）
 ```
+
+目录结构与官方 `2026-competition-ecosystem` 分支一致（一个生态赛道一个目录），
+因此文件放在 `gaode/` 下，不需要额外配置。
+
+## 二之二、另一份可选材料
+
+`https://github.com/SmallLightning/geo-agent` 是同一套流程的**本地参考实现**
+（Python，零依赖，16 个单测），用于自测与演示，**不作为提交物**。
 
 ## 三、作品简介（200 字，可直接贴）
 
