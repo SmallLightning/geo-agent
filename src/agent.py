@@ -95,7 +95,7 @@ def compose_llm(llm: LLMClient, text: str, intent: Intent, result: dict) -> str:
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
         temperature=0.4,
-        max_tokens=500,
+        max_tokens=1500,
     )
 
 

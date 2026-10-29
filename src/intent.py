@@ -85,8 +85,8 @@ def parse_rules(text: str) -> Intent:
     # ---- origin
     for pattern in (
         r"从\s*([^，,。;；]{1,20}?)\s*(?:出发|走|开始|过去)",
-        r"在\s*([^，,。;；]{1,20}?)\s*(?:附近|周边|周围)",
-        r"([^，,。;；]{2,20}?)(?:附近|周边|周围)",
+        r"在\s*([^，,。;；]{1,20}?)\s*(?:附近|周边|周围|旁边|边上)",
+        r"([^，,。;；]{2,20}?)(?:附近|周边|周围|旁边|边上)",
     ):
         m = re.search(pattern, t)
         if m:
@@ -197,7 +197,7 @@ def parse_llm(client, text: str) -> Intent:
                 {"role": "user", "content": text},
             ],
             temperature=0.0,
-            max_tokens=400,
+            max_tokens=900,
             json_mode=True,
         )
         data = json.loads(raw.strip().strip("`").removeprefix("json").strip())

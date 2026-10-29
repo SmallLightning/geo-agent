@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -61,8 +62,9 @@ class LLMClient:
         self,
         messages: list[dict],
         temperature: float = 0.2,
-        max_tokens: int = 800,
+        max_tokens: int = 1200,
         json_mode: bool = False,
+        retries: int = 3,
     ) -> str:
         if not self.configured:
             raise LLMError(
@@ -85,23 +87,34 @@ class LLMClient:
             url = f"{url}?{urllib.parse.urlencode({'GroupId': group_id})}"
 
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        req = urllib.request.Request(
-            url,
-            data=body,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            },
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", "ignore")[:400]
-            raise LLMError(f"HTTP {exc.code}: {detail}") from exc
-        except Exception as exc:  # noqa: BLE001
-            raise LLMError(f"request failed: {exc}") from exc
+        data = None
+        last_error: Exception | None = None
+        for attempt in range(retries + 1):
+            try:
+                req = urllib.request.Request(
+                    url,
+                    data=body,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {self.api_key}",
+                    },
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                break
+            except urllib.error.HTTPError as exc:
+                detail = exc.read().decode("utf-8", "ignore")[:400]
+                last_error = LLMError(f"HTTP {exc.code}: {detail}")
+                if exc.code < 500:
+                    break  # 4xx 重试也没意义
+                time.sleep(1.5 * (attempt + 1))
+            except Exception as exc:  # noqa: BLE001 - TLS reset 常见，重试
+                last_error = exc
+                if attempt < retries:
+                    time.sleep(1.5 * (attempt + 1))
+        if data is None:
+            raise LLMError(f"request failed: {last_error}")
 
         choices = data.get("choices") or []
         if not choices:
@@ -111,5 +124,10 @@ class LLMClient:
         if isinstance(content, list):  # some providers return content parts
             content = "".join(part.get("text", "") for part in content if isinstance(part, dict))
         if not content:
-            raise LLMError(f"empty content in response: {str(data)[:300]}")
+            finish = choices[0].get("finish_reason")
+            reasoning = message.get("reasoning_content") or ""
+            raise LLMError(
+                f"empty content (finish_reason={finish}, reasoning_chars={len(reasoning)}): "
+                "思考模型可能把 token 预算耗在 reasoning 上，需要调大 max_tokens"
+            )
         return content
